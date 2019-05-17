@@ -1,8 +1,13 @@
 // This is a Stamp that wrap a value in a Box
-const stampit = require('@stamp/it')
-const _ = require('lodash');
-const assert = require('./assert');
+import stampit from '@stamp/it'
+import _ from 'lodash';
+import assert  from './assert';
 
+function NewBox () {
+
+}
+
+/*
 const Box = stampit({
   initializers:[
     function(value){
@@ -78,6 +83,7 @@ const Box = stampit({
     // if the return value is not === true it will throw a new Error of errorConstructor type
     assert(requestors, errorSpec ){
       requestors = _.castArray(requestors);
+      if (!Array.isArray(requestors)) requestors = [requesto]
 
       validateRequestors(requestors);
 
