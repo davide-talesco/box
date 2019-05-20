@@ -7,7 +7,7 @@ interface ErrorSpec {
   reason?: string;
 }
 type IBox = { [key: string]: any };
-type Requestor = Function;
+type Requestor = (b: IBox) => any;
 type Assertion = (b: IBox) => any;
 
 class BoxError extends Error {
