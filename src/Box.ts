@@ -3,7 +3,7 @@ import _ from 'lodash';
 import assert from 'assert';
 interface ErrorSpec {
   message?: string;
-  status?: number;
+  statusCode?: number;
   reason?: string;
 }
 type IBox = { [key: string]: any };
@@ -13,11 +13,11 @@ type Assertion = (b: IBox) => any;
 class BoxError extends Error {
   statusCode: number;
   reason?: string;
-  constructor (errorSpec: ErrorSpec) {
-    const message = _.get(errorSpec, 'message') || 'Assert Box Error';
-    const statusCode = _.get(errorSpec, 'statusCode') || 400;
-    const reason = _.get(errorSpec, 'reason');
-
+  constructor ({
+    message = 'Assert Box Error',
+    statusCode = 500,
+    reason
+  }: ErrorSpec = {}) {
     super(message);
     this.statusCode = statusCode;
     if (reason) this.reason = reason;
