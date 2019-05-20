@@ -1,4 +1,3 @@
-// This is a Stamp that wrap a value in a Box
 import _ from 'lodash';
 // import assert  from './assert';
 import assert from 'assert';
