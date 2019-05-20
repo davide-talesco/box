@@ -1,7 +1,7 @@
 // simple wrapper around nodejs assert that redefine message property as enumerable so it can be serialized by pipe
 import assert from 'assert';
 
-const safeAssert = fn => (...args) => {
+const safeAssert = (fn: Function) => (...args: any[]) => {
   try {
     fn(...args);
   } catch (e) {

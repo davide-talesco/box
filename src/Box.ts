@@ -1,6 +1,6 @@
 import _ from 'lodash';
-// import assert  from './assert';
-import assert from 'assert';
+import assert from './assert';
+
 interface ErrorSpec {
   message?: string;
   statusCode?: number;
@@ -62,18 +62,18 @@ function validateRequestors (requestors: Requestor[]) {
 class Box {
   value?: any;
   _requestors: Requestor[];
+
   constructor (value?: any) {
     this.value = value;
     this._requestors = [];
   }
 
-  static continue = () => () => ({});
-
-  static return (fn: Function) {
-    const method = (...args: any[]) => fn(...args);
-    method.stocazzo = true;
-    return method;
-  }
+  static errors = {
+    BoxError,
+    BoxEarlyReturnError,
+    Unauthorized,
+    NotFound
+  };
 
   if (assertion: Assertion, onTrue: Function) {
     validateRequestors([assertion, onTrue]);
