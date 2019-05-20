@@ -75,7 +75,7 @@ class Box {
     validateRequestors([assertion, onTrue]);
 
     // enforce all are async
-    [assertion, onTrue] = [assertion, onTrue].map(fn => async box => fn(box))
+    [assertion, onTrue] = [assertion, onTrue].map(fn => async (box: IBox) => fn(box))
 
     this._requestors.push( 
       (box: IBox) => assertion(box)
@@ -91,7 +91,7 @@ class Box {
     validateRequestors([assertion, onTrue, onFalse]);
 
       // enforce all are async
-      [assertion, onTrue, onFalse] = [assertion, onTrue, onFalse].map(fn => async box => fn(box))
+      [assertion, onTrue, onFalse] = [assertion, onTrue, onFalse].map(fn => async (box: IBox) => fn(box))
 
       this._requestors.push( 
         (box: any) => assertion(box)
@@ -124,7 +124,7 @@ class Box {
     validateRequestors([assertion, ret]);
 
     // enforce all are async
-    [assertion, ret] = [assertion, ret].map(fn => async box => fn(box))
+    [assertion, ret] = [assertion, ret].map(fn => async (box: IBox) => fn(box))
 
 
     this._requestors.push( 
