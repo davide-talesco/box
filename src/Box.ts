@@ -70,6 +70,22 @@ class Box {
     )
     return this
   }
+  ifElse (assertion: Assertion, onTrue: Function, onFalse: Function) {
+    validateRequestors([assertion, onTrue, onFalse]);
+
+      // enforce all are async
+      [assertion, onTrue, onFalse] = [assertion, onTrue, onFalse].map(fn => async box => fn(box))
+
+      this._requestors.push( 
+        (box: any) => assertion(box)
+          .then((flag: boolean) => {
+            if (flag) return onTrue(box);
+            return onFalse(box);
+          })
+      )
+
+      return this
+  }
   exec () {
     return this._requestors.reduce((promise, requestor) => {
       return promise.then(( async () => {

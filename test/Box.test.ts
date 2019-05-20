@@ -14,3 +14,17 @@ describe('Box().if', () => {
     await Box().if(() => false, fn);    
   });
 });
+
+describe('Box().ifElse', () => {
+  it('should only run if function if assertion returns true', async (flags: any) => {
+    const onTrue = flags.mustCall(() => {}, 1);
+    const onFalse = flags.mustCall(() => {}, 0);
+    await Box().ifElse(() => true, onTrue, onFalse).exec();
+  });
+
+  it('should only run else function if assertion returns false', async (flags: any) => {
+    const onTrue = flags.mustCall(() => {}, 0);
+    const onFalse = flags.mustCall(() => {}, 1);
+    await Box().ifElse(() => false, onTrue, onFalse).exec();
+  });
+});
