@@ -4,14 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "lab --transform node_modules/lab-transform-typescript"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@hapi/code": "^5.3.1",
+    "@hapi/lab": "^19.0.1",
+    "@types/hapi__code": "^5.3.0",
+    "@types/hapi__lab": "^18.1.0",
     "@types/lodash": "^4.14.129",
     "@types/node": "^12.0.2",
+    "lab-transform-typescript": "^3.0.1",
     "ts-node": "^8.1.0",
     "typescript": "^3.4.5"
   }

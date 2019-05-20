@@ -1,10 +1,34 @@
 // This is a Stamp that wrap a value in a Box
-import stampit from '@stamp/it'
 import _ from 'lodash';
 import assert  from './assert';
 
-function NewBox () {
+type IBox = { [key: any]: any };
+type Requestor = Function;
+type Assertion = (b: IBox) => any;
 
+class Box {
+  value?: any;
+  _requestors: Requestor[];
+  constructor (value?: any) {
+    this.value = value;
+    this._requestors = [];
+  }
+
+  if(assertion: Assertion, onTrue: Function){
+    validateRequestors([assertion, onTrue]);
+
+    // enforce all are async
+    [assertion, onTrue] = [assertion, onTrue].map(fn => async box => fn(box))
+
+    this._requestors.push( 
+      (box: IBox) => assertion(box)
+        .then((flag: boolean) => {
+          if (flag) return onTrue(box);
+          return;
+        })
+    )
+    return this
+  }
 }
 
 /*
@@ -214,8 +238,11 @@ const Box = stampit({
   }
 });
 
-function validateRequestors(requestors){
+
+*/
+
+function validateRequestors(requestors: Requestor[]){
   requestors.map((requestor, index) => assert(typeof requestor === 'function', `Requestor at index: ${index} is not a function`))
 }
 
-module.exports = Box;
+export default (value?: any) => new Box(value);
