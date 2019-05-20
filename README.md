@@ -2,8 +2,8 @@
 ## Usage
 ```javascript
 // es6
-import Box from 'box';
+import Box from 'wonderbox';
 
 // require
-const Box = require('box').default
+const Box = require('wonderbox').default
 ```
