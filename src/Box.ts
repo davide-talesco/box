@@ -1,10 +1,51 @@
 // This is a Stamp that wrap a value in a Box
 import _ from 'lodash';
-import assert  from './assert';
+// import assert  from './assert';
+import assert from 'assert';
 
-type IBox = { [key: any]: any };
+type IBox = { [key: string]: any };
 type Requestor = Function;
 type Assertion = (b: IBox) => any;
+
+class BoxError extends Error {
+  statusCode: number;
+  reason?: string;
+  constructor(errorSpec: { message: string; status: number; reason: string; }) {
+    const message = _.get(errorSpec, 'message') || 'Assert Box Error';
+    const statusCode = _.get(errorSpec, 'statusCode') || 400;
+    const reason = _.get(errorSpec, 'reason');
+
+    super(message)
+    this.statusCode = statusCode;
+    if (reason) this.reason = reason;
+    Error.captureStackTrace(this, BoxError);
+  }
+}
+
+class BoxEarlyReturnError extends Error {
+  code: string;
+  returnValue?: any;
+  constructor(res?: any) {
+    const message = 'Box Triggered Early Return'
+    super(message)
+    this.code = 'ERR_BOX_EARLY_RETURN';
+    this.returnValue = res;
+  }
+}
+
+function Unauthorized () {
+  return { 
+    statusCode: 403, 
+    message: 'Unauthorized' 
+  }
+}
+
+function NotFound (type: any) {
+  return { 
+    statusCode: 404, 
+    message: `${type} not found`
+  }
+}
 
 class Box {
   value?: any;
@@ -28,6 +69,19 @@ class Box {
         })
     )
     return this
+  }
+  exec () {
+    return this._requestors.reduce((promise, requestor) => {
+      return promise.then(( async () => {
+        return requestor(this)
+      } ));
+    }, Promise.resolve())
+    .catch(err => {
+      if (err instanceof BoxEarlyReturnError){
+        return err.returnValue;
+      }
+      throw err;
+    })
   }
 }
 
