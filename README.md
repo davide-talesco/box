@@ -1,6 +1,6 @@
 # box
 ## Usage
-```s
+```javascript
 // es6
 import Box from 'box';
 
