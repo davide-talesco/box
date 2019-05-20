@@ -2,8 +2,10 @@
   "name": "Box",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
     "test": "lab --transform node_modules/lab-transform-typescript"
   },
   "keywords": [],
