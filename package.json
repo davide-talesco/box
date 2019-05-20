@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "test": "lab --transform node_modules/lab-transform-typescript"
+    "test": "lab --transform node_modules/lab-transform-typescript",
+    "gen-docs": "typedoc --out docs"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +24,7 @@
     "lint-staged": "^8.1.7",
     "prettier-standard": "^9.1.1",
     "ts-node": "^8.1.0",
+    "typedoc": "^0.14.2",
     "typescript": "^3.4.5"
   },
   "lint-staged": {
