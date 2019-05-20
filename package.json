@@ -4,7 +4,6 @@
   "description": "",
   "main": "./dist/index.js",
   "scripts": {
-    "prepublish": "npm run build || exit 0",
     "build": "tsc",
     "build:watch": "tsc --watch",
     "test": "lab --transform node_modules/lab-transform-typescript",
