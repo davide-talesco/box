@@ -51,7 +51,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// This is a Stamp that wrap a value in a Box
 var lodash_1 = __importDefault(require("lodash"));
 // import assert  from './assert';
 var assert_1 = __importDefault(require("assert"));
@@ -96,7 +95,9 @@ function NotFound(type) {
     };
 }
 function validateRequestors(requestors) {
-    requestors.map(function (requestor, index) { return assert_1.default(typeof requestor === 'function', "Requestor at index: " + index + " is not a function"); });
+    requestors.map(function (requestor, index) {
+        return assert_1.default(typeof requestor === 'function', "Requestor at index: " + index + " is not a function");
+    });
 }
 var Box = /** @class */ (function () {
     function Box(value) {
@@ -122,12 +123,13 @@ var Box = /** @class */ (function () {
         _a = [assertion, onTrue].map(function (fn) { return function (box) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
             return [2 /*return*/, fn(box)];
         }); }); }; }), assertion = _a[0], onTrue = _a[1];
-        this._requestors.push(function (box) { return assertion(box)
-            .then(function (flag) {
-            if (flag)
-                return onTrue(box);
-            return;
-        }); });
+        this._requestors.push(function (box) {
+            return assertion(box).then(function (flag) {
+                if (flag)
+                    return onTrue(box);
+                return;
+            });
+        });
         return this;
     };
     Box.prototype.ifElse = function (assertion, onTrue, onFalse) {
@@ -138,22 +140,24 @@ var Box = /** @class */ (function () {
         _a = [assertion, onTrue, onFalse].map(function (fn) { return function (box) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
             return [2 /*return*/, fn(box)];
         }); }); }; }), assertion = _a[0], onTrue = _a[1], onFalse = _a[2];
-        this._requestors.push(function (box) { return assertion(box)
-            .then(function (flag) {
-            if (flag)
-                return onTrue(box);
-            return onFalse(box);
-        }); });
+        this._requestors.push(function (box) {
+            return assertion(box).then(function (flag) {
+                if (flag)
+                    return onTrue(box);
+                return onFalse(box);
+            });
+        });
         return this;
     };
     Box.prototype.exec = function () {
         var _this = this;
-        return this._requestors.reduce(function (promise, requestor) {
-            return promise.then((function () { return __awaiter(_this, void 0, void 0, function () {
+        return this._requestors
+            .reduce(function (promise, requestor) {
+            return promise.then(function () { return __awaiter(_this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     return [2 /*return*/, requestor(this)];
                 });
-            }); }));
+            }); });
         }, Promise.resolve())
             .catch(function (err) {
             if (err instanceof BoxEarlyReturnError) {
@@ -165,19 +169,24 @@ var Box = /** @class */ (function () {
     Box.prototype.ifReturn = function (assertion, ret) {
         var _this = this;
         var _a;
-        ret = ret || (function () { return; });
+        ret =
+            ret ||
+                (function () {
+                    return;
+                });
         validateRequestors([assertion, ret]);
         // enforce all are async
         _a = [assertion, ret].map(function (fn) { return function (box) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
             return [2 /*return*/, fn(box)];
         }); }); }; }), assertion = _a[0], ret = _a[1];
-        this._requestors.push(function (box) { return assertion(box)
-            .then(function (flag) {
-            if (flag)
-                return ret(box).then(function (res) {
-                    throw new BoxEarlyReturnError(res);
-                });
-        }); });
+        this._requestors.push(function (box) {
+            return assertion(box).then(function (flag) {
+                if (flag)
+                    return ret(box).then(function (res) {
+                        throw new BoxEarlyReturnError(res);
+                    });
+            });
+        });
         return this;
     };
     Box.prototype.assert = function (requestors, errorSpec) {
@@ -189,12 +198,16 @@ var Box = /** @class */ (function () {
         var requestorsAsync = requestors.map(function (requestor) { return function (box) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
             return [2 /*return*/, requestor(box)];
         }); }); }; });
-        this._requestors.push(function (box) { return Promise.all(requestorsAsync.map(function (requestor) { return requestor(box); }))
-            .then(function (assertions) { return assertions.reduce(function (acc, current) { return acc === true || current === true; }, false); })
-            .then(function (assertion) {
-            if (assertion !== true)
-                throw new BoxError(errorSpec);
-        }); });
+        this._requestors.push(function (box) {
+            return Promise.all(requestorsAsync.map(function (requestor) { return requestor(box); }))
+                .then(function (assertions) {
+                return assertions.reduce(function (acc, current) { return acc === true || current === true; }, false);
+            })
+                .then(function (assertion) {
+                if (assertion !== true)
+                    throw new BoxError(errorSpec);
+            });
+        });
         return this;
     };
     Box.prototype.map = function (requestor, errorExtend) {
@@ -205,8 +218,7 @@ var Box = /** @class */ (function () {
         else {
             this._requestors.push(function (box) {
                 try {
-                    return Promise.resolve(requestor(box))
-                        .catch(function (err) {
+                    return Promise.resolve(requestor(box)).catch(function (err) {
                         throw Object.assign(err, errorExtend);
                     });
                 }
@@ -226,14 +238,16 @@ var Box = /** @class */ (function () {
         requestors = lodash_1.default.flatten(requestors);
         validateRequestors(requestors);
         // close all requestor but first over this box
-        requestors = requestors.map(function (requestor, i) { return i !== 0 ? requestor(_this) : requestor; }, this);
+        requestors = requestors.map(function (requestor, i) { return (i !== 0 ? requestor(_this) : requestor); }, this);
         validateRequestors(requestors);
         // build composed requestor function
-        var requestor = function (box) { return (requestors.reduce(function (promise, requestor) {
-            return promise.then((function (value) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
-                return [2 /*return*/, requestor(value)];
-            }); }); }));
-        }, Promise.resolve(box))); };
+        var requestor = function (box) {
+            return requestors.reduce(function (promise, requestor) {
+                return promise.then(function (value) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+                    return [2 /*return*/, requestor(value)];
+                }); }); });
+            }, Promise.resolve(box));
+        };
         this._requestors.push(requestor);
         return this;
     };
