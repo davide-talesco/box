@@ -5,5 +5,5 @@
 import Box from 'box';
 
 // require
-const Box = require('box').default();
+const Box = require('box').default
 ```
