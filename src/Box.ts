@@ -14,12 +14,12 @@ type Assertion = (b: IBox) => any;
 class BoxError extends Error {
   statusCode: number;
   reason?: string;
-  constructor(errorSpec: ErrorSpec) {
+  constructor (errorSpec: ErrorSpec) {
     const message = _.get(errorSpec, 'message') || 'Assert Box Error';
     const statusCode = _.get(errorSpec, 'statusCode') || 400;
     const reason = _.get(errorSpec, 'reason');
 
-    super(message)
+    super(message);
     this.statusCode = statusCode;
     if (reason) this.reason = reason;
     Error.captureStackTrace(this, BoxError);
@@ -29,30 +29,35 @@ class BoxError extends Error {
 class BoxEarlyReturnError extends Error {
   code: string;
   returnValue?: any;
-  constructor(res?: any) {
-    const message = 'Box Triggered Early Return'
-    super(message)
+  constructor (res?: any) {
+    const message = 'Box Triggered Early Return';
+    super(message);
     this.code = 'ERR_BOX_EARLY_RETURN';
     this.returnValue = res;
   }
 }
 
 function Unauthorized () {
-  return { 
-    statusCode: 403, 
-    message: 'Unauthorized' 
-  }
+  return {
+    statusCode: 403,
+    message: 'Unauthorized'
+  };
 }
 
 function NotFound (type: any) {
-  return { 
-    statusCode: 404, 
+  return {
+    statusCode: 404,
     message: `${type} not found`
-  }
+  };
 }
 
-function validateRequestors(requestors: Requestor[]){
-  requestors.map((requestor, index) => assert(typeof requestor === 'function', `Requestor at index: ${index} is not a function`))
+function validateRequestors (requestors: Requestor[]) {
+  requestors.map((requestor, index) =>
+    assert(
+      typeof requestor === 'function',
+      `Requestor at index: ${index} is not a function`
+    )
+  );
 }
 
 class Box {
@@ -63,7 +68,7 @@ class Box {
     this._requestors = [];
   }
 
-  static continue = () => () => ({})
+  static continue = () => () => ({});
 
   static return (fn: Function) {
     const method = (...args: any[]) => fn(...args);
@@ -71,132 +76,143 @@ class Box {
     return method;
   }
 
-  if(assertion: Assertion, onTrue: Function) {
+  if (assertion: Assertion, onTrue: Function) {
     validateRequestors([assertion, onTrue]);
 
     // enforce all are async
-    [assertion, onTrue] = [assertion, onTrue].map(fn => async (box: IBox) => fn(box))
+    [assertion, onTrue] = [assertion, onTrue].map(fn => async (box: IBox) =>
+      fn(box)
+    );
 
-    this._requestors.push( 
-      (box: IBox) => assertion(box)
-        .then((flag: boolean) => {
-          if (flag) return onTrue(box);
-          return;
-        })
-    )
-    return this
+    this._requestors.push((box: IBox) =>
+      assertion(box).then((flag: boolean) => {
+        if (flag) return onTrue(box);
+        return;
+      })
+    );
+    return this;
   }
 
   ifElse (assertion: Assertion, onTrue: Function, onFalse: Function) {
     validateRequestors([assertion, onTrue, onFalse]);
 
-      // enforce all are async
-      [assertion, onTrue, onFalse] = [assertion, onTrue, onFalse].map(fn => async (box: IBox) => fn(box))
+    // enforce all are async
+    [assertion, onTrue, onFalse] = [assertion, onTrue, onFalse].map(
+      fn => async (box: IBox) => fn(box)
+    );
 
-      this._requestors.push( 
-        (box: any) => assertion(box)
-          .then((flag: boolean) => {
-            if (flag) return onTrue(box);
-            return onFalse(box);
-          })
-      )
+    this._requestors.push((box: any) =>
+      assertion(box).then((flag: boolean) => {
+        if (flag) return onTrue(box);
+        return onFalse(box);
+      })
+    );
 
-      return this
+    return this;
   }
 
   exec () {
-    return this._requestors.reduce((promise, requestor) => {
-      return promise.then(( async () => {
-        return requestor(this)
-      } ));
-    }, Promise.resolve())
-    .catch(err => {
-      if (err instanceof BoxEarlyReturnError){
-        return err.returnValue;
-      }
-      throw err;
-    })
+    return this._requestors
+      .reduce((promise, requestor) => {
+        return promise.then(async () => {
+          return requestor(this);
+        });
+      }, Promise.resolve())
+      .catch(err => {
+        if (err instanceof BoxEarlyReturnError) {
+          return err.returnValue;
+        }
+        throw err;
+      });
   }
 
-  ifReturn(assertion: Assertion, ret: Function){
-    ret = ret || (() => { return })
-    
+  ifReturn (assertion: Assertion, ret: Function) {
+    ret =
+      ret ||
+      (() => {
+        return;
+      });
+
     validateRequestors([assertion, ret]);
 
     // enforce all are async
-    [assertion, ret] = [assertion, ret].map(fn => async (box: IBox) => fn(box))
+    [assertion, ret] = [assertion, ret].map(fn => async (box: IBox) => fn(box));
 
-
-    this._requestors.push( 
-      (box: IBox) => assertion(box)
-        .then((flag: boolean) => {
-          if (flag) return ret(box).then((res: any) => {
+    this._requestors.push((box: IBox) =>
+      assertion(box).then((flag: boolean) => {
+        if (flag)
+          return ret(box).then((res: any) => {
             throw new BoxEarlyReturnError(res);
           });
-        })
-    )
+      })
+    );
 
-    return this
+    return this;
   }
 
-  assert(requestors: Requestor[], errorSpec: ErrorSpec){
-    if (!Array.isArray(requestors)) requestors = [requestors]
+  assert (requestors: Requestor[], errorSpec: ErrorSpec) {
+    if (!Array.isArray(requestors)) requestors = [requestors];
 
     validateRequestors(requestors);
 
     // enforce requestors are async
-    var requestorsAsync = requestors.map(requestor => async (box: IBox) => requestor(box));
-      
-    this._requestors.push( 
-      (box: IBox) => Promise.all(requestorsAsync.map(requestor => requestor(box)))
-      .then(assertions => assertions.reduce((acc, current ) => acc === true || current === true , false))
-      .then(assertion => {
-        if (assertion !== true) throw new BoxError(errorSpec)}) 
-    )
+    var requestorsAsync = requestors.map(requestor => async (box: IBox) =>
+      requestor(box)
+    );
 
-    return this
+    this._requestors.push((box: IBox) =>
+      Promise.all(requestorsAsync.map(requestor => requestor(box)))
+        .then(assertions =>
+          assertions.reduce(
+            (acc, current) => acc === true || current === true,
+            false
+          )
+        )
+        .then(assertion => {
+          if (assertion !== true) throw new BoxError(errorSpec);
+        })
+    );
+
+    return this;
   }
 
-  map(requestor: Requestor, errorExtend?: any){
+  map (requestor: Requestor, errorExtend?: any) {
     validateRequestors([requestor]);
 
-    if (!errorExtend){
+    if (!errorExtend) {
       this._requestors.push(requestor);
-    }
-    else {
-      this._requestors.push(
-        function(box: IBox){
-          try {
-            return Promise.resolve(requestor(box))
-              .catch(err => {
-                throw Object.assign(err, errorExtend)
-              })
-          }
-          catch(err){
-            throw Object.assign(err, errorExtend)
-          }
-        } 
-      );
+    } else {
+      this._requestors.push(function (box: IBox) {
+        try {
+          return Promise.resolve(requestor(box)).catch(err => {
+            throw Object.assign(err, errorExtend);
+          });
+        } catch (err) {
+          throw Object.assign(err, errorExtend);
+        }
+      });
     }
     return this;
   }
 
-  compose(...requestors: Requestor[]){
+  compose (...requestors: Requestor[]) {
     requestors = _.flatten(requestors);
 
     validateRequestors(requestors);
 
     // close all requestor but first over this box
-    requestors = requestors.map((requestor, i) => i !== 0 ? requestor(this) : requestor, this)
-    
+    requestors = requestors.map(
+      (requestor, i) => (i !== 0 ? requestor(this) : requestor),
+      this
+    );
+
     validateRequestors(requestors);
 
     // build composed requestor function
-    const requestor = (box: any) => (
+    const requestor = (box: any) =>
       requestors.reduce((promise, requestor) => {
-        return promise.then(( async (value: any) => requestor(value)));
-      }, Promise.resolve(box))
-    );
+        return promise.then(async (value: any) => requestor(value));
+      }, Promise.resolve(box));
 
     this._requestors.push(requestor);
 

@@ -2,21 +2,20 @@
 import assert from 'assert';
 
 const safeAssert = fn => (...args) => {
-  try{
-    fn(...args)
-  }
-  catch(e){
+  try {
+    fn(...args);
+  } catch (e) {
     Object.defineProperty(e, 'message', {
       enumerable: true
     });
     throw e;
   }
-}
+};
 
 const myAssert = safeAssert(assert);
 
 Object.keys(assert).map(key => {
-  myAssert[key] = safeAssert(assert[key])
-})
+  myAssert[key] = safeAssert(assert[key]);
+});
 
 export default myAssert;
