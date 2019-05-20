@@ -8,7 +8,7 @@ interface ErrorSpec {
 }
 type IBox = { [key: string]: any };
 type Requestor = (b: IBox) => any;
-type Assertion = (b: IBox) => any;
+type Assertion = (b: IBox) => boolean | Promise <boolean> | undefined;
 
 class BoxError extends Error {
   statusCode: number;
@@ -75,35 +75,35 @@ class Box {
     NotFound
   };
 
-  if (assertion: Assertion, onTrue: Function) {
+  if (assertion: Assertion, onTrue: Requestor) {
     validateRequestors([assertion, onTrue]);
 
     // enforce all are async
-    [assertion, onTrue] = [assertion, onTrue].map(fn => async (box: IBox) =>
+    const [assertionP, onTrueP] = [assertion, onTrue].map(fn => async (box: IBox) =>
       fn(box)
     );
 
     this._requestors.push((box: IBox) =>
-      assertion(box).then((flag: boolean) => {
-        if (flag) return onTrue(box);
+      assertionP(box).then((flag: any) => {
+        if (flag) return onTrueP(box);
         return;
       })
     );
     return this;
   }
 
-  ifElse (assertion: Assertion, onTrue: Function, onFalse: Function) {
+  ifElse (assertion: Assertion, onTrue: Requestor, onFalse: Requestor) {
     validateRequestors([assertion, onTrue, onFalse]);
 
     // enforce all are async
-    [assertion, onTrue, onFalse] = [assertion, onTrue, onFalse].map(
+    const [assertionP, onTrueP, onFalseP] = [assertion, onTrue, onFalse].map(
       fn => async (box: IBox) => fn(box)
     );
 
     this._requestors.push((box: any) =>
-      assertion(box).then((flag: boolean) => {
-        if (flag) return onTrue(box);
-        return onFalse(box);
+    assertionP(box).then((flag: boolean) => {
+        if (flag) return onTrueP(box);
+        return onFalseP(box);
       })
     );
 
@@ -125,22 +125,17 @@ class Box {
       });
   }
 
-  ifReturn (assertion: Assertion, ret: Function) {
-    ret =
-      ret ||
-      (() => {
-        return;
-      });
+  ifReturn (assertion: Assertion, ret: Requestor = () => {}) {
 
     validateRequestors([assertion, ret]);
 
     // enforce all are async
-    [assertion, ret] = [assertion, ret].map(fn => async (box: IBox) => fn(box));
+    const [assertionP, retP] = [assertion, ret].map(fn => async (box: IBox) => fn(box));
 
     this._requestors.push((box: IBox) =>
-      assertion(box).then((flag: boolean) => {
+      assertionP(box).then((flag: boolean) => {
         if (flag)
-          return ret(box).then((res: any) => {
+          return retP(box).then((res: any) => {
             throw new BoxEarlyReturnError(res);
           });
       })
