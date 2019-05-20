@@ -52,16 +52,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var lodash_1 = __importDefault(require("lodash"));
-// import assert  from './assert';
-var assert_1 = __importDefault(require("assert"));
+var assert_1 = __importDefault(require("./assert"));
 var BoxError = /** @class */ (function (_super) {
     __extends(BoxError, _super);
-    function BoxError(errorSpec) {
-        var _this = this;
-        var message = lodash_1.default.get(errorSpec, 'message') || 'Assert Box Error';
-        var statusCode = lodash_1.default.get(errorSpec, 'statusCode') || 400;
-        var reason = lodash_1.default.get(errorSpec, 'reason');
-        _this = _super.call(this, message) || this;
+    function BoxError(_a) {
+        var _b = _a === void 0 ? {} : _a, _c = _b.message, message = _c === void 0 ? 'Assert Box Error' : _c, _d = _b.statusCode, statusCode = _d === void 0 ? 500 : _d, reason = _b.reason;
+        var _this = _super.call(this, message) || this;
         _this.statusCode = statusCode;
         if (reason)
             _this.reason = reason;
@@ -104,17 +100,6 @@ var Box = /** @class */ (function () {
         this.value = value;
         this._requestors = [];
     }
-    Box.return = function (fn) {
-        var method = function () {
-            var args = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                args[_i] = arguments[_i];
-            }
-            return fn.apply(void 0, args);
-        };
-        method.stocazzo = true;
-        return method;
-    };
     Box.prototype.if = function (assertion, onTrue) {
         var _this = this;
         var _a;
@@ -251,7 +236,12 @@ var Box = /** @class */ (function () {
         this._requestors.push(requestor);
         return this;
     };
-    Box.continue = function () { return function () { return ({}); }; };
+    Box.errors = {
+        BoxError: BoxError,
+        BoxEarlyReturnError: BoxEarlyReturnError,
+        Unauthorized: Unauthorized,
+        NotFound: NotFound
+    };
     return Box;
 }());
 exports.default = (function (value) { return new Box(value); });
