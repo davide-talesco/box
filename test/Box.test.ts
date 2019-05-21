@@ -27,4 +27,10 @@ describe('Box().ifElse', () => {
     const onFalse = flags.mustCall(() => {}, 1);
     await Box().ifElse(() => false, onTrue, onFalse).exec();
   });
+
+  it('should handle async functions', async (flags: any) => {
+    const onFalse = flags.mustCall(() => {}, 1);
+    const onTrue = flags.mustCall(() => {}, 0);
+    await Box().ifElse(async () => false, onTrue, onFalse).exec();
+  });
 });

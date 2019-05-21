@@ -95,16 +95,11 @@ class Box {
   ifElse (assertion: Assertion, onTrue: Requestor, onFalse: Requestor) {
     validateRequestors([assertion, onTrue, onFalse]);
 
-    // enforce all are async
-    const [assertionP, onTrueP, onFalseP] = [assertion, onTrue, onFalse].map(
-      fn => async (box: IBox) => fn(box)
-    );
-
-    this._requestors.push((box: any) =>
-      assertionP(box).then((flag: boolean) => {
-        if (flag) return onTrueP(box);
-        return onFalseP(box);
-      })
+    this._requestors.push(
+      async (box: any): Promise<any> => {
+        const flag = await assertion(box);
+        return flag ? await onTrue(box) : await onFalse(box);
+      }
     );
 
     return this;
