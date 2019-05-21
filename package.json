@@ -7,7 +7,8 @@
     "build": "tsc",
     "build:watch": "tsc --watch",
     "test": "lab --transform node_modules/lab-transform-typescript",
-    "gen-docs": "typedoc --out docs"
+    "gen-docs": "typedoc --out docs",
+    "commit": "git-cz"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +20,7 @@
     "@types/hapi__lab": "^18.1.0",
     "@types/lodash": "^4.14.129",
     "@types/node": "^12.0.2",
+    "cz-conventional-changelog": "^2.1.0",
     "husky": "^2.3.0",
     "lab-transform-typescript": "^3.0.1",
     "lint-staged": "^8.1.7",
@@ -40,5 +42,10 @@
   },
   "dependencies": {
     "lodash": "^4.17.11"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
