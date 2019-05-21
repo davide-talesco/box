@@ -15,6 +15,7 @@ const safeAssert = (fn: Function) => (...args: any[]) => {
 const myAssert = safeAssert(assert);
 
 Object.keys(assert).map(key => {
+  // @ts-ignore I'm not sure how to annotete this one, fix later.
   myAssert[key] = safeAssert(assert[key]);
 });
 

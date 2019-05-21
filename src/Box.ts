@@ -8,7 +8,7 @@ interface ErrorSpec {
 }
 type IBox = { [key: string]: any };
 type Requestor = (b: IBox) => any;
-type Assertion = (b: IBox) => boolean | Promise <boolean> | undefined;
+type Assertion = (b: IBox) => boolean | Promise<boolean> | undefined;
 
 class BoxError extends Error {
   statusCode: number;
@@ -79,8 +79,8 @@ class Box {
     validateRequestors([assertion, onTrue]);
 
     // enforce all are async
-    const [assertionP, onTrueP] = [assertion, onTrue].map(fn => async (box: IBox) =>
-      fn(box)
+    const [assertionP, onTrueP] = [assertion, onTrue].map(
+      fn => async (box: IBox) => fn(box)
     );
 
     this._requestors.push((box: IBox) =>
@@ -101,7 +101,7 @@ class Box {
     );
 
     this._requestors.push((box: any) =>
-    assertionP(box).then((flag: boolean) => {
+      assertionP(box).then((flag: boolean) => {
         if (flag) return onTrueP(box);
         return onFalseP(box);
       })
@@ -126,13 +126,15 @@ class Box {
   }
 
   ifReturn (assertion: Assertion, ret: Requestor = () => {}) {
-
     validateRequestors([assertion, ret]);
 
     // enforce all are async
-    const [assertionP, retP] = [assertion, ret].map(fn => async (box: IBox) => fn(box));
+    const [assertionP, retP] = [assertion, ret].map(fn => async (box: IBox) =>
+      fn(box)
+    );
 
     this._requestors.push((box: IBox) =>
+      // @ts-ignore Forgive me
       assertionP(box).then((flag: boolean) => {
         if (flag)
           return retP(box).then((res: any) => {
