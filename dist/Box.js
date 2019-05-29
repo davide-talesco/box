@@ -239,6 +239,9 @@ var Box = /** @class */ (function () {
         this._requestors.push(requestor);
         return this;
     };
+    Box.of = function (value) {
+        return new Box(value);
+    };
     Box.errors = {
         BoxError: BoxError,
         BoxEarlyReturnError: BoxEarlyReturnError,
@@ -247,4 +250,4 @@ var Box = /** @class */ (function () {
     };
     return Box;
 }());
-exports.default = (function (value) { return new Box(value); });
+exports.default = Box;

@@ -40,9 +40,9 @@ declare class Box {
     ifElse(assertion: Assertion, onTrue: Requestor, onFalse: Requestor): this;
     exec(): Promise<any>;
     ifReturn(assertion: Assertion, ret?: Requestor): this;
-    assert(requestors: Requestor[], errorSpec: ErrorSpec): this;
+    assert(requestors: Requestor[] | Requestor, errorSpec: ErrorSpec): this;
     map(requestor: Requestor, errorExtend?: any): this;
     compose(...requestors: Requestor[]): this;
+    static of(value?: any): Box;
 }
-declare const _default: (value?: any) => Box;
-export default _default;
+export default Box;
