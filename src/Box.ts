@@ -141,7 +141,7 @@ class Box {
     return this;
   }
 
-  assert (requestors: Requestor[], errorSpec: ErrorSpec) {
+  assert (requestors: Requestor[] | Requestor, errorSpec: ErrorSpec) {
     if (!Array.isArray(requestors)) requestors = [requestors];
 
     validateRequestors(requestors);
@@ -209,6 +209,10 @@ class Box {
 
     return this;
   }
+
+  static of(value?: any){
+    return new Box(value);
+  }
 }
 
-export default (value?: any) => new Box(value);
+export default Box;
