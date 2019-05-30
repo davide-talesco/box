@@ -18,9 +18,9 @@ declare class BoxEarlyReturnError extends Error {
     returnValue?: any;
     constructor(res?: any);
 }
-declare function Unauthorized(): {
+declare function Unauthorized(message?: string): {
     statusCode: number;
-    message: string;
+    message: string | undefined;
 };
 declare function NotFound(type: any): {
     statusCode: number;

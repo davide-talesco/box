@@ -36,10 +36,12 @@ class BoxEarlyReturnError extends Error {
   }
 }
 
-function Unauthorized () {
+function Unauthorized (message?: string) {
+
+  message ? message = `Unauthorized: ${message}` : 'Unauthorized'
   return {
     statusCode: 403,
-    message: 'Unauthorized'
+    message
   };
 }
 

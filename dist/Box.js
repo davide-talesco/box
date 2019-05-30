@@ -78,10 +78,11 @@ var BoxEarlyReturnError = /** @class */ (function (_super) {
     }
     return BoxEarlyReturnError;
 }(Error));
-function Unauthorized() {
+function Unauthorized(message) {
+    message ? message = "Unauthorized: " + message : 'Unauthorized';
     return {
         statusCode: 403,
-        message: 'Unauthorized'
+        message: message
     };
 }
 function NotFound(type) {
